@@ -1,0 +1,13 @@
+Metric,1. Rule Baseline,2. Fixed MILP,3. GridMind Agent,Agent vs Baseline
+Net Cost (₹),"₹40,900,584","₹22,770,752","₹22,686,441",+44.5%
+Import Purchase Cost (₹),"₹13,908,012","₹13,343,759","₹13,190,232",+5.2%
+Export Revenue (₹),₹0,"₹370,138","₹188,489",+18848926.3%
+Contract Shortfall (MWh),1312.40,154.21,148.36,+88.7%
+Shortfall Penalty (₹),"₹19,686,008","₹2,313,176","₹2,225,422",+88.7%
+Unserved Critical Load (MWh),43.247,0.000,0.000,43.247 MWh
+Carbon Emissions (tCO₂),1874.5,1803.2,1769.0,+5.6%
+Carbon Cost (₹),"₹2,811,808","₹2,704,742","₹2,653,522",+5.6%
+Renewable Utilization (%),100.0%,100.0%,100.0%,+0.0% pts
+Curtailment (MWh),0.0,0.0,0.0,0.0 MWh
+Battery Throughput (MWh),340.1,740.7,748.8,+408.7 MWh
+Hard Safety Violations,0,0,0,Verified 0

@@ -1,0 +1,45 @@
+# Preset Demo Event Scripts
+
+day_at_deccan:
+  name: "A Day at Deccan Renewables"
+  season: "A"
+  description: "24-hour simulation demonstrating adaptive multi-asset dispatch under sudden cloud cover, storm alert, battery outage, export congestion, and price spikes."
+  events:
+    - type: "cloud_cover"
+      time: "10:30"
+      interval: 42
+      duration_intervals: 8          # 2 hours
+      affected_assets: ["S1", "S2"]
+      magnitude: 0.60                # 60% reduction
+      announced_lead_intervals: 0    # Sudden surprise
+
+    - type: "storm_alert"
+      time: "12:00"
+      interval: 48
+      announced_lead_intervals: 24   # Announced 6 hours ahead of arrival at 18:00 (interval 72)
+      target_interval: 72
+      duration_intervals: 12         # 3 hours storm duration
+      affected_solar_reduction: 0.80 # 80% solar drop
+      wind_cut_out: true             # Wind may hit cut-out
+      export_limit_mw: 80.0          # Export line de-rated to 80 MW
+
+    - type: "battery_outage"
+      time: "14:00"
+      interval: 56
+      duration_intervals: 16         # 4 hours
+      affected_assets: ["B2"]
+      announced_lead_intervals: 0    # Sudden failure
+
+    - type: "line_constraint"
+      time: "16:00"
+      interval: 64
+      duration_intervals: 8          # 2 hours
+      export_limit_mw: 120.0
+      announced_lead_intervals: 4
+
+    - type: "price_spike"
+      time: "19:00"
+      interval: 76
+      duration_intervals: 4          # 1 hour
+      multiplier: 2.0
+      announced_lead_intervals: 2

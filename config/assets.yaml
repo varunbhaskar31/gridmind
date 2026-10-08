@@ -1,0 +1,123 @@
+# Configuration: Portfolio Assets and Grid Limits for Deccan Renewables Pvt. Ltd. (Karnataka)
+
+solar_farms:
+  - id: S1
+    name: "Pavagada-A"
+    lat: 14.10
+    lon: 77.28
+    capacity_mw: 150.0
+    performance_ratio: 0.80
+
+  - id: S2
+    name: "Tumakuru"
+    lat: 13.34
+    lon: 77.10
+    capacity_mw: 120.0
+    performance_ratio: 0.80
+
+  - id: S3
+    name: "Koppal"
+    lat: 15.35
+    lon: 76.15
+    capacity_mw: 100.0
+    performance_ratio: 0.80
+
+  - id: S4
+    name: "Raichur"
+    lat: 16.20
+    lon: 77.35
+    capacity_mw: 80.0
+    performance_ratio: 0.80
+
+  - id: S5
+    name: "Kalaburagi"
+    lat: 17.33
+    lon: 76.83
+    capacity_mw: 50.0
+    performance_ratio: 0.80
+
+wind_farms:
+  - id: W1
+    name: "Chitradurga"
+    lat: 14.23
+    lon: 76.40
+    capacity_mw: 100.0
+    cut_in_speed_ms: 3.0
+    rated_speed_ms: 12.0
+    cut_out_speed_ms: 25.0
+
+  - id: W2
+    name: "Gadag"
+    lat: 15.43
+    lon: 75.63
+    capacity_mw: 80.0
+    cut_in_speed_ms: 3.0
+    rated_speed_ms: 12.0
+    cut_out_speed_ms: 25.0
+
+  - id: W3
+    name: "Harapanahalli"
+    lat: 14.79
+    lon: 75.99
+    capacity_mw: 60.0
+    cut_in_speed_ms: 3.0
+    rated_speed_ms: 12.0
+    cut_out_speed_ms: 25.0
+
+batteries:
+  - id: B1
+    power_mw: 60.0
+    energy_mwh: 240.0
+    eta_charge: 0.95
+    eta_discharge: 0.95
+    soc_min: 0.10
+    soc_max: 0.95
+    initial_soc: 0.50
+    degradation_cost_inr_per_mwh: 500.0
+
+  - id: B2
+    power_mw: 40.0
+    energy_mwh: 160.0
+    eta_charge: 0.95
+    eta_discharge: 0.95
+    soc_min: 0.10
+    soc_max: 0.95
+    initial_soc: 0.50
+    degradation_cost_inr_per_mwh: 500.0
+
+consumers:
+  - id: C1
+    name: "Steel plant"
+    base_mw: 120.0
+    profile_type: "near_flat"
+    critical_fraction: 0.60
+    dr_max_mw: 25.0
+    dr_incentive_inr_per_mwh: 3000.0
+
+  - id: C2
+    name: "Data centre"
+    base_mw: 60.0
+    profile_type: "flat"
+    critical_fraction: 0.90
+    dr_max_mw: 5.0
+    dr_incentive_inr_per_mwh: 6000.0
+
+  - id: C3
+    name: "Textile mill"
+    base_mw: 50.0
+    profile_type: "two_shifts"
+    critical_fraction: 0.40
+    dr_max_mw: 15.0
+    dr_incentive_inr_per_mwh: 2500.0
+
+  - id: C4
+    name: "Cement plant"
+    base_mw: 70.0
+    profile_type: "afternoon_dip"
+    critical_fraction: 0.50
+    dr_max_mw: 20.0
+    dr_incentive_inr_per_mwh: 2800.0
+
+grid_limits:
+  max_import_mw: 150.0
+  max_export_mw: 200.0

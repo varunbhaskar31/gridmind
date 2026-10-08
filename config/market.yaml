@@ -1,0 +1,30 @@
+# Market, penalties, carbon, and simulation parameters
+
+market:
+  price_cap_inr_per_mwh: 10000.0
+  price_floor_inr_per_mwh: 0.0
+  sell_fee_factor: 0.97                 # sell price = market price * 0.97
+  default_price_inr_per_mwh: 4500.0
+
+penalties:
+  contract_shortfall_inr_per_mwh: 15000.0
+  value_of_lost_load_inr_per_mwh: 100000.0   # VOLL for unserved critical load
+  curtailment_penalty_inr_per_mwh: 1000.0    # Green energy loss weight
+
+carbon:
+  grid_emission_factor_tco2_per_mwh: 0.71    # Source: Central Electricity Authority (CEA) India baseline
+  carbon_price_inr_per_tco2: 1500.0
+
+simulation:
+  interval_minutes: 15
+  interval_hours: 0.25
+  horizon_intervals: 32                      # 8 hours rolling horizon
+  seasons:
+    A:
+      name: "Summer (Solar-strong)"
+      start_date: "2025-04-14"
+      end_date: "2025-04-20"
+    B:
+      name: "Monsoon (Wind-strong)"
+      start_date: "2025-07-14"
+      end_date: "2025-07-20"

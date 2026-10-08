@@ -1,0 +1,76 @@
+# Agent configuration: thresholds, default weights, modes, approval rules
+
+thresholds:
+  renewable_deviation_medium: 0.15    # >15% deviation from forecast = medium
+  renewable_deviation_high: 0.35      # >35% deviation = high
+  price_spike_ratio: 1.5              # price > 1.5x rolling mean = high
+  low_battery_soc: 0.25               # battery SoC < 25% requires attention
+  storm_alert_horizon_hours: 6.0      # storm announced within 6 hours = high
+
+modes:
+  green:
+    description: "Maximize renewable self-consumption, minimize curtailment and carbon"
+    weights:
+      cost: 1.0
+      carbon: 2.5
+      curtailment: 3.0
+      degradation: 0.8
+      reliability: 3.0
+    reserve_floor: 0.15
+
+  economic:
+    description: "Maximize arbitrage profit, charge low, sell high"
+    weights:
+      cost: 3.5
+      carbon: 0.8
+      curtailment: 1.0
+      degradation: 1.2
+      reliability: 2.5
+    reserve_floor: 0.10
+
+  reliability_first:
+    description: "Guaranteed contract fulfillment and protection of critical loads"
+    weights:
+      cost: 1.0
+      carbon: 0.5
+      curtailment: 0.5
+      degradation: 0.5
+      reliability: 5.0
+    reserve_floor: 0.35
+
+  storm_preparation:
+    description: "Defensive battery holding and charge build-up ahead of severe weather"
+    weights:
+      cost: 0.5
+      carbon: 0.5
+      curtailment: 0.5
+      degradation: 0.5
+      reliability: 5.0
+    reserve_floor: 0.60
+
+  outage_recovery:
+    description: "Compensate for lost battery or generation capacity"
+    weights:
+      cost: 1.2
+      carbon: 1.0
+      curtailment: 1.0
+      degradation: 0.5
+      reliability: 4.5
+    reserve_floor: 0.25
+
+  congestion_management:
+    description: "Export constrained transmission line; absorb surplus or curtail cleanly"
+    weights:
+      cost: 1.5
+      carbon: 1.5
+      curtailment: 2.5
+      degradation: 1.0
+      reliability: 3.5
+    reserve_floor: 0.15
+
+approval_rules:
+  dr_threshold_mw: 30.0              # DR called > 30 MW total requires operator approval
+  sell_during_storm_alert: true      # Selling power while storm alert active requires approval
+  battery_soc_below: 0.25            # Discharging battery below 25% requires approval
+  low_confidence: true               # Low confidence strategy requires approval
+  auto_approve_delay_seconds: 3      # Auto-approve delay in demo/auto mode

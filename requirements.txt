@@ -1,0 +1,11 @@
+pulp>=2.8.0,<3.0.0
+pandas>=2.2.0
+numpy>=1.26.0
+requests>=2.31.0
+pydantic>=2.7.0
+google-genai>=0.1.1
+streamlit>=1.35.0
+plotly>=5.22.0
+pyyaml>=6.0.1
+python-dotenv>=1.0.1
+pytest>=8.2.0
