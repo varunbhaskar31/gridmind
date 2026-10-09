@@ -40,7 +40,7 @@ GridMind requires **no cloud dependencies, no Docker containers, and no database
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/varunbhaskar/gridmind.git
+git clone https://github.com/varunbhaskar31/gridmind.git
 cd gridmind
 
 # 2. Create and activate virtual environment (Python 3.11+)
