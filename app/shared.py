@@ -105,7 +105,7 @@ def load_preset_scenario(scenario_key: str) -> None:
             start = int(ev.get("interval", 0))
             dur = int(ev.get("duration_intervals", 4))
             mag = float(ev.get("magnitude", 1.0))
-            assets = ev.get("affected_assets")
+            assets = ev.get("affected_assets") or []
             extra = {}
             if "wind_cut_out" in ev:
                 extra["wind_cut_out"] = ev["wind_cut_out"]

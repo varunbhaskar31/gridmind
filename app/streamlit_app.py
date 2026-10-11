@@ -87,6 +87,11 @@ with st.sidebar:
     st.image("https://img.icons8.com/fluency/96/electricity.png", width=64)
     st.title("GridMind Orchestrator")
     st.caption("ET AI Hackathon | PS4: Renewable Orchestrator")
+    _llm = orch.llm_client
+    st.caption(
+        f"🧠 Reasoning engine: **Gemini ({_llm.model_name}) — live**" if not _llm.is_mock
+        else "🧠 Reasoning engine: **deterministic fallback** (no Gemini key)"
+    )
     st.markdown("---")
 
     st.subheader("Simulation Controls")

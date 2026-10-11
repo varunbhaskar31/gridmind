@@ -125,17 +125,22 @@ def mock_strategy_decision(
         }
         chosen_floor = max(0.35, reserve_floor)
         tradeoff = (
-            f"Chosen conservative plan costs ₹{risk_cons.expected_cost_inr:,.0f} expected (vs ₹{risk_pref.expected_cost_inr:,.0f}), "
-            f"reducing contract shortfall risk to {risk_cons.p_shortfall*100:.1f}% (vs {risk_pref.p_shortfall*100:.1f}%)."
+            f"Chose the conservative plan holding at least {chosen_floor*100:.0f}% battery reserve: "
+            f"₹{risk_cons.expected_cost_inr:,.0f} expected vs ₹{risk_pref.expected_cost_inr:,.0f} for the {mode.replace('_', ' ')} plan"
         )
+        if abs(risk_cons.p_shortfall - risk_pref.p_shortfall) >= 0.005:
+            tradeoff += (
+                f", moving contract shortfall risk from {risk_pref.p_shortfall*100:.1f}% to {risk_cons.p_shortfall*100:.1f}%"
+            )
+        tradeoff += "."
     else:
         chosen_plan = plan_pref
         chosen_risk = risk_pref
         chosen_weights = preferred_weights
         chosen_floor = reserve_floor
         tradeoff = (
-            f"Chosen preferred {mode} plan costs ₹{risk_pref.expected_cost_inr:,.0f} expected with "
-            f"{risk_pref.p_shortfall*100:.1f}% shortfall probability and min SoC {min(risk_pref.min_soc_reached.values())*100:.0f}%."
+            f"Chose the {mode.replace('_', ' ')} plan: ₹{risk_pref.expected_cost_inr:,.0f} expected "
+            f"(vs ₹{risk_cons.expected_cost_inr:,.0f} conservative), lowest battery SoC {min(risk_pref.min_soc_reached.values())*100:.0f}%."
         )
 
     candidates = [

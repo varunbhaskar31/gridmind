@@ -344,6 +344,12 @@ class StrategyAgent:
             reserve_floor=decision.reserve_floor,
             terminal_soc_target=decision.terminal_soc_target,
         )
+        candidate_ids = {c.plan_id for c in (decision.candidates_considered or [])}
+        if decision.chosen_plan_id in candidate_ids:
+            # Re-solved with the chosen candidate's own weights/floor: keep its identity
+            # so the UI and audit log show which evaluated candidate was committed.
+            fresh_plan.plan_id = decision.chosen_plan_id
+        else:
+            decision.chosen_plan_id = fresh_plan.plan_id
         self.active_plans_pool[fresh_plan.plan_id] = fresh_plan
-        decision.chosen_plan_id = fresh_plan.plan_id
         return fresh_plan
