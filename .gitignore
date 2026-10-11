@@ -22,4 +22,4 @@ htmlcov/
 # Temporary outputs
 logs/
 bin/
-
+*.log

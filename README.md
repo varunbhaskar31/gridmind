@@ -2,10 +2,13 @@
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![PuLP MILP](https://img.shields.io/badge/optimizer-PuLP%20MILP%20(CBC)-green.svg)](https://coin-or.github.io/pulp/)
-[![Streamlit UI](https://img.shields.io/badge/dashboard-Streamlit-red.svg)](https://streamlit.io/)
+[![Streamlit UI](https://img.shields.io/badge/dashboard-Streamlit-red.svg)](https://varunbhaskar31-gridmind-appstreamlit-app-luqicq.streamlit.app/)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Streamlit%20Cloud-brightgreen.svg?logo=streamlit)](https://varunbhaskar31-gridmind-appstreamlit-app-luqicq.streamlit.app/)
 [![Hackathon Claim](https://img.shields.io/badge/Claim-D2%20%7C%20F3-purple.svg)](#hackathon-positioning-claim-d2--f3)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
+> 🚀 **Live Interactive Prototype:** **[https://varunbhaskar31-gridmind-appstreamlit-app-luqicq.streamlit.app/](https://varunbhaskar31-gridmind-appstreamlit-app-luqicq.streamlit.app/)**  
+> 📊 **Hackathon Presentation Deck:** [`GridMind_ET_AI_Hackathon_Presentation.pptx`](GridMind_ET_AI_Hackathon_Presentation.pptx) | [Interactive Slides (HTML)](presentation.html) | [Pitch Guide](PRESENTATION_DECK.md)  
 > **ET AI Hackathon: Agentic Edition (Accenture × Economic Times)**  
 > **Problem Statement 4: Utilities — Renewable Energy Orchestrator**  
 > **Fictional Client:** Deccan Renewables Pvt. Ltd. (Karnataka, India)  

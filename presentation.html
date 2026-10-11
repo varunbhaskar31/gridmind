@@ -1,0 +1,1820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GridMind: Autonomous Renewable Energy Portfolio Orchestrator | ET AI Hackathon Presentation</title>
+  <style>
+    :root {
+      --bg: #0B132B;
+      --card-bg: #131D38;
+      --card-border: #2D3A5D;
+      --text-white: #FFFFFF;
+      --text-slate: #94A3B8;
+      --text-dim: #64748B;
+      --cyan: #38BDF8;
+      --emerald: #10B981;
+      --amber: #F59E0B;
+      --indigo: #818CF8;
+      --rose: #F43F5E;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #030712;
+      color: var(--text-white);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* Top Bar Controls */
+    .topbar {
+      height: 48px;
+      background: rgba(11, 19, 43, 0.95);
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+      flex-shrink: 0;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--cyan);
+      letter-spacing: 0.5px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-white);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      background: #1E293B;
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    .btn.active {
+      background: var(--cyan);
+      color: #0B132B;
+      border-color: var(--cyan);
+    }
+
+    /* Main Deck Stage */
+    .deck-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      background: #030712;
+      padding: 20px;
+    }
+
+    .slide-stage {
+      width: 100%;
+      max-width: 1400px;
+      aspect-ratio: 16 / 9;
+      background: var(--bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding: 36px 44px 28px 44px;
+      overflow: hidden;
+    }
+
+    /* Slide Header */
+    .slide-header {
+      margin-bottom: 20px;
+      flex-shrink: 0;
+    }
+
+    .slide-tag {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 6px;
+    }
+
+    .slide-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-white);
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    .slide-subtitle {
+      font-size: 13.5px;
+      color: var(--text-slate);
+      line-height: 1.4;
+    }
+
+    /* Slide Content Area */
+    .slide-body {
+      flex: 1;
+      display: flex;
+      gap: 20px;
+      min-height: 0;
+    }
+
+    /* Slide Footer */
+    .slide-footer {
+      height: 32px;
+      border-top: 1px solid var(--card-border);
+      margin-top: 16px;
+      padding-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--text-dim);
+      flex-shrink: 0;
+    }
+
+    .slide-footer-left {
+      display: flex;
+      gap: 16px;
+    }
+
+    .slide-number {
+      font-weight: 700;
+      color: var(--text-slate);
+    }
+
+    /* Card Components */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .card.cyan-border { border-color: rgba(56, 189, 248, 0.4); }
+    .card.emerald-border { border-color: rgba(16, 185, 129, 0.4); }
+    .card.amber-border { border-color: rgba(245, 158, 11, 0.4); }
+    .card.indigo-border { border-color: rgba(129, 140, 248, 0.4); }
+    .card.rose-border { border-color: rgba(244, 63, 94, 0.4); }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .text-cyan { color: var(--cyan); }
+    .text-emerald { color: var(--emerald); }
+    .text-amber { color: var(--amber); }
+    .text-indigo { color: var(--indigo); }
+    .text-rose { color: var(--rose); }
+
+    .card-body {
+      font-size: 12px;
+      color: var(--text-slate);
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow-y: auto;
+    }
+
+    .item-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .item-label {
+      font-weight: 700;
+      color: var(--text-white);
+      font-size: 12.5px;
+    }
+
+    .item-desc {
+      color: var(--text-slate);
+    }
+
+    /* Stat Box */
+    .stat-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      text-align: left;
+      flex: 1;
+    }
+
+    .stat-val {
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-white);
+      margin-bottom: 2px;
+    }
+
+    .stat-sub {
+      font-size: 11px;
+      color: var(--text-slate);
+    }
+
+    /* Tables */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      background: var(--card-bg);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11.5px;
+      text-align: left;
+    }
+
+    th {
+      background: #1E293B;
+      color: var(--cyan);
+      font-weight: 700;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    td {
+      padding: 8px 14px;
+      border-bottom: 1px solid rgba(45, 58, 93, 0.4);
+      color: var(--text-slate);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:nth-child(even) {
+      background: rgba(15, 23, 42, 0.4);
+    }
+
+    .td-highlight {
+      font-weight: 700;
+      color: var(--emerald);
+    }
+
+    .td-warn {
+      color: var(--rose);
+      font-weight: 600;
+    }
+
+    /* Speaker Notes Drawer */
+    .notes-drawer {
+      height: 140px;
+      background: #080D1E;
+      border-top: 1px solid var(--card-border);
+      padding: 14px 24px;
+      font-size: 12.5px;
+      line-height: 1.6;
+      color: #CBD5E1;
+      overflow-y: auto;
+      display: none;
+      flex-shrink: 0;
+    }
+
+    .notes-drawer.open {
+      display: block;
+    }
+
+    .notes-header {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    /* Hidden Slides */
+    .slide-page {
+      display: none;
+      height: 100%;
+      width: 100%;
+      flex-direction: column;
+    }
+
+    .slide-page.active {
+      display: flex;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge-cyan { background: rgba(56, 189, 248, 0.15); color: var(--cyan); border: 1px solid var(--cyan); }
+    .badge-emerald { background: rgba(16, 185, 129, 0.15); color: var(--emerald); border: 1px solid var(--emerald); }
+    .badge-amber { background: rgba(245, 158, 11, 0.15); color: var(--amber); border: 1px solid var(--amber); }
+
+    /* Print styles */
+    @media print {
+      body {
+        overflow: visible;
+        height: auto;
+        background: white;
+        color: black;
+      }
+      .topbar, .notes-drawer {
+        display: none !important;
+      }
+      .deck-container {
+        padding: 0;
+        background: white;
+      }
+      .slide-stage {
+        max-width: 100%;
+        border: none;
+        box-shadow: none;
+        page-break-after: always;
+        height: 100vh;
+      }
+      .slide-page {
+        display: flex !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar Controls -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <span>THE ECONOMIC TIMES × ACCENTURE</span>
+      <span style="color: var(--text-dim);">|</span>
+      <span>ET AI HACKATHON: AGENTIC EDITION</span>
+      <span style="color: var(--text-dim);">|</span>
+      <span style="color: var(--emerald);">PS-4 UTILITIES: GRIDMIND</span>
+    </div>
+    <div class="topbar-right">
+      <button class="btn" id="prevBtn" onclick="prevSlide()">◀ Prev</button>
+      <span id="counter" style="font-size: 13px; font-weight: 700; color: var(--text-slate);">1 / 16</span>
+      <button class="btn" id="nextBtn" onclick="nextSlide()">Next ▶</button>
+      <button class="btn" id="notesToggle" onclick="toggleNotes()">🎙 Notes (S)</button>
+      <button class="btn" id="fullscreenToggle" onclick="toggleFullscreen()">⛶ Fullscreen (F)</button>
+    </div>
+  </div>
+
+  <!-- Deck Container -->
+  <div class="deck-container">
+    <div class="slide-stage" id="slideStage">
+
+      <!-- ================= SLIDE 1: TITLE ================= -->
+      <div class="slide-page active" data-slide="1">
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 10px 20px;">
+          <div class="slide-tag" style="font-size: 12px; margin-bottom: 12px;">ET AI HACKATHON: AGENTIC EDITION | PRESENTED BY ACCENTURE & THE ECONOMIC TIMES</div>
+          <h1 style="font-size: 48px; font-weight: 900; line-height: 1.1; margin-bottom: 8px;">GridMind</h1>
+          <h2 style="font-size: 24px; font-weight: 700; color: var(--emerald); margin-bottom: 16px;">Autonomous Renewable Energy Portfolio Orchestrator</h2>
+          <p style="font-size: 15px; color: var(--text-slate); max-width: 900px; line-height: 1.5; margin-bottom: 32px;">
+            A Neuro-Symbolic Agentic Decision System uniting Generative Reasoning (Gemini) with Deterministic MILP Optimization (PuLP) & Hard Safety Guardrails for 15-Minute Electricity Markets.
+          </p>
+
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+            <div class="stat-box" style="border-color: var(--cyan);">
+              <div class="stat-val text-cyan">PS-4</div>
+              <div class="stat-label">Utilities Orchestrator</div>
+              <div class="stat-sub">Renewables, BESS, industrial offtake & market arbitrage</div>
+            </div>
+            <div class="stat-box" style="border-color: var(--indigo);">
+              <div class="stat-val text-indigo">D2 / F3</div>
+              <div class="stat-label">9-Blocker Claim</div>
+              <div class="stat-sub">High demonstrable reliability + rolling uncertainty sim</div>
+            </div>
+            <div class="stat-box" style="border-color: var(--emerald);">
+              <div class="stat-val text-emerald">-44.5%</div>
+              <div class="stat-label">Daily Cost Reduction</div>
+              <div class="stat-sub">₹18.2 Million daily operational savings vs baseline</div>
+            </div>
+            <div class="stat-box" style="border-color: var(--amber);">
+              <div class="stat-val text-amber">0</div>
+              <div class="stat-label">Safety Violations</div>
+              <div class="stat-sub">2,880 consecutive intervals (30 days) with 0 VOLL</div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <div class="slide-footer-left">Target: Deccan Renewables Pvt. Ltd. (Karnataka) | Primary Persona: Shift Dispatch Manager</div>
+          <div class="slide-number">Slide 1 of 16</div>
+        </div>
+      </div>
+
+      <!-- ================= SLIDE 2: INDUSTRY CONTEXT ================= -->
+      <div class="slide-page" data-slide="2">
+        <div class="slide-header">
+          <div class="slide-tag">Problem Statement & Real-World Friction</div>
+          <div class="slide-title">The 15-Minute Dispatch Crisis in Modern Renewable Grids</div>
+          <div class="slide-subtitle">Why manual control rooms fail under renewable volatility, battery wear, and strict offtake penalties</div>
+        </div>
+        <div class="slide-body">
+          <div class="card cyan-border">
+            <div class="card-title text-cyan">⚡ 1. Generation & Grid Volatility</div>
+            <div class="card-body">
+              <div class="item-block">
+                <span class="item-label">Intermittent Solar Drop</span>
+                <span class="item-desc">5 solar parks (Pavagada, Tumakuru, etc.) drop up to 80% generation within 15 minutes under sudden cloud cover.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Stochastic Wind Swings</span>
+                <span class="item-desc">Chitradurga & Gadag wind farms fluctuate sharply between cut-in (3 m/s) and rated (12 m/s) wind speeds.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Corridor Congestion</span>
+                <span class="item-desc">Transmission lines derate thermally during peak hours, choking renewable evacuation corridors.</span>
+              </div>
+            </div>
+          </div>
+          <div class="card amber-border">
+            <div class="card-title text-amber">📈 2. Market & Contractual Risks</div>
+            <div class="card-body">
+              <div class="item-block">
+                <span class="item-label">IEX Real-Time Tariff Spikes</span>
+                <span class="item-desc">Indian Energy Exchange prices swing unpredictably from ₹1,000/MWh up to the ₹10,000/MWh statutory ceiling.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Round-The-Clock (RTC) Mandates</span>
+                <span class="item-desc">Contracted to deliver 300 MW continuous power to steel, data center, and cement plants without interruptions.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">₹15,000/MWh Shortfall Penalties</span>
+                <span class="item-desc">Contractual shortfall penalties exceed maximum spot market purchase prices, punishing under-generation.</span>
+              </div>
+            </div>
+          </div>
+          <div class="card rose-border">
+            <div class="card-title text-rose">🧠 3. The Human Control Room Bottleneck</div>
+            <div class="card-body">
+              <div class="item-block">
+                <span class="item-label">Cognitive Overload</span>
+                <span class="item-desc">Shift Dispatch Managers must balance 10 assets, 4 customers, and 32 forward intervals every 15 minutes.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">BESS Degradation Dilemma</span>
+                <span class="item-desc">Over-cycling batteries destroys cell life (₹500/MWh throughput cost), while under-cycling wastes clean energy.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Zero-Tolerance Safety Rules</span>
+                <span class="item-desc">Shedding critical customer loads (₹100,000/MWh VOLL) or violating line limits causes severe grid instability.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <div class="slide-footer-left">GridMind | Deccan Renewables Pvt. Ltd. | Claim: D2 / F3</div>
+          <div class="slide-number">Slide 2 of 16</div>
+        </div>
+      </div>
+
+      <!-- ================= SLIDE 3: 9-BLOCKER MATRIX ================= -->
+      <div class="slide-page" data-slide="3">
+        <div class="slide-header">
+          <div class="slide-tag">Hackathon Evaluation Alignment</div>
+          <div class="slide-title">Self-Estimated 9-Blocker Claim: Position D2 / F3</div>
+          <div class="slide-subtitle">Rigorous justification of our claimed capability level and explicit prevention of overclaiming penalties</div>
+        </div>
+        <div class="slide-body">
+          <div class="card indigo-border" style="flex: 0.85;">
+            <div class="card-title text-indigo">📊 3×3 Solution Grid Mapping</div>
+            <div class="card-body">
+              <table style="text-align: center; margin-top: 4px;">
+                <tr>
+                  <th style="color: var(--text-white);">Depth \ Features</th>
+                  <th>F1 (Actions)</th>
+                  <th>F2 (Opt Criteria)</th>
+                  <th>F3 (Rolling Sim)</th>
+                </tr>
+                <tr>
+                  <td style="font-weight: 700; color: var(--text-dim);">D3 (Multimodal)</td>
+                  <td style="color: var(--text-dim);">F1</td>
+                  <td style="color: var(--text-dim);">F2</td>
+                  <td style="color: var(--text-dim);">F3</td>
+                </tr>
+                <tr style="background: rgba(16, 185, 129, 0.15); border: 2px solid var(--emerald);">
+                  <td style="font-weight: 800; color: var(--emerald);">D2 (High Reliability)</td>
+                  <td style="color: var(--text-slate);">F1</td>
+                  <td style="color: var(--text-slate);">F2</td>
+                  <td style="font-weight: 900; color: var(--emerald); font-size: 13px;">★ D2 / F3 ★</td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 700; color: var(--text-dim);">D1 (Structured Base)</td>
+                  <td style="color: var(--text-dim);">F1</td>
+                  <td style="color: var(--text-dim);">F2</td>
+                  <td style="color: var(--text-dim);">F3</td>
+                </tr>
+              </table>
+              <div style="margin-top: 10px; font-size: 11.5px; color: var(--amber); line-height: 1.4;">
+                <strong>Anti-Overclaim Policy:</strong> GridMind intentionally avoids claiming D3 (no fake satellite/multimodal claims). Penalties for over/under-claiming are strictly guarded against.
+              </div>
+            </div>
+          </div>
+          <div style="flex: 1.15; display: flex; flex-direction: column; gap: 16px;">
+            <div class="card emerald-border" style="flex: 1;">
+              <div class="card-title text-emerald">🛡️ Depth D2: High Demonstrable Reliability</div>
+              <div class="card-body">
+                <div class="item-block">
+                  <span class="item-label">Zero Hard-Constraint Violations</span>
+                  <span class="item-desc">Verified 0 violations across 2,880 consecutive 15-minute intervals (30 full days).</span>
+                </div>
+                <div class="item-block">
+                  <span class="item-label">Zero Unserved Critical Load</span>
+                  <span class="item-desc">100% protection of non-sheddable customer fractions (0.000 MWh unserved vs 43.2 MWh in baseline).</span>
+                </div>
+                <div class="item-block">
+                  <span class="item-label">Deterministic Pre-Execution Gate</span>
+                  <span class="item-desc">Python guardrail intercepts and validates all candidate setpoints before physical actuation.</span>
+                </div>
+              </div>
+            </div>
+            <div class="card cyan-border" style="flex: 1;">
+              <div class="card-title text-cyan">🔮 Features F3: Rolling Uncertainty Simulation</div>
+              <div class="card-body">
+                <div class="item-block">
+                  <span class="item-label">Rolling Horizon MPC</span>
+                  <span class="item-desc">Continuously re-optimizes 32 forward intervals (8 hours) every 15 minutes.</span>
+                </div>
+                <div class="item-block">
+                  <span class="item-label">Multi-Quantile Forecast Cones</span>
+                  <span class="item-desc">Models P10 (pessimistic), P50 (expected), and P90 (optimistic) bounds across weather & loads.</span>
+                </div>
+                <div class="item-block">
+                  <span class="item-label">Monte Carlo Tail-Risk Evaluation</span>
+                  <span class="item-desc">Tests candidate plans against 20 perturbed stochastic weather and price scenarios.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <div class="slide-footer-left">GridMind | Deccan Renewables Pvt. Ltd. | Claim: D2 / F3</div>
+          <div class="slide-number">Slide 3 of 16</div>
+        </div>
+      </div>
+
+      <!-- ================= SLIDE 4: CORE INNOVATION ================= -->
+      <div class="slide-page" data-slide="4">
+        <div class="slide-header">
+          <div class="slide-tag">Core Innovation & Philosophy</div>
+          <div class="slide-title">The Neuro-Symbolic Agentic Paradigm</div>
+          <div class="slide-subtitle">Why generative AI must never compute dispatch numbers — and how we bridge reasoning with mathematical rigor</div>
+        </div>
+        <div class="slide-body">
+          <div class="card rose-border">
+            <div class="card-title text-rose">❌ Pure LLM Control (Fatal Flaw)</div>
+            <div class="card-body">
+              <div class="item-block">
+                <span class="item-label">Arithmetic Hallucinations</span>
+                <span class="item-desc">LLMs cannot guarantee exact Kirchhoff power flow conservation or linear battery efficiency losses.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Non-Physical Dispatch</span>
+                <span class="item-desc">A 10 MW calculation error trips substation protection relays and causes cascading blackout.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Unbounded Latency</span>
+                <span class="item-desc">External API delays or token limits cannot be risked during real-time 15-minute dispatch deadlines.</span>
+              </div>
+            </div>
+          </div>
+          <div class="card amber-border">
+            <div class="card-title text-amber">⚠️ Static MILP Solver (Limitation)</div>
+            <div class="card-body">
+              <div class="item-block">
+                <span class="item-label">Rigid Objective Weights</span>
+                <span class="item-desc">Traditional optimization hardcodes weights that cannot adapt to contextual emergencies.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Context Blindness</span>
+                <span class="item-desc">Solvers cannot read storm advisories, interpret weather radar, or adjust strategic risk postures.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Black-Box Outputs</span>
+                <span class="item-desc">Produces raw numerical matrices with zero natural-language explanation for control room shift managers.</span>
+              </div>
+            </div>
+          </div>
+          <div class="card emerald-border">
+            <div class="card-title text-emerald">✅ The GridMind Breakthrough</div>
+            <div class="card-body">
+              <div class="item-block">
+                <span class="item-label">The LLM Reasons & Directs</span>
+                <span class="item-desc">Gemini detects contextual anomalies, shifts operational modes, tunes multi-objective weights, and explains trade-offs.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">The Solver Solves</span>
+                <span class="item-desc">Deterministic MILP (PuLP/CBC) computes exact, physically feasible megawatt setpoints in &lt;40 ms.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Deterministic Guardrails</span>
+                <span class="item-desc">Hard Python safety rules intercept every plan before actuation. Zero AI hallucinations ever reach the grid.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <div class="slide-footer-left">GridMind | Deccan Renewables Pvt. Ltd. | Claim: D2 / F3</div>
+          <div class="slide-number">Slide 4 of 16</div>
+        </div>
+      </div>
+
+      <!-- ================= SLIDE 5: PORTFOLIO TOPOLOGY ================= -->
+      <div class="slide-page" data-slide="5">
+        <div class="slide-header">
+          <div class="slide-tag">Operational Asset Modeling</div>
+          <div class="slide-title">Portfolio Topology: Deccan Renewables (Karnataka, India)</div>
+          <div class="slide-subtitle">740 MW Generation, 400 MWh Storage, and 300 MW Industrial Demand under Indian Energy Exchange (IEX) Rules</div>
+        </div>
+        <div class="slide-body">
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
+            <div class="card cyan-border" style="flex: 1;">
+              <div class="card-title text-cyan">☀️ 5 Solar Parks (500 MW)</div>
+              <div class="card-body">
+                <div class="item-block">
+                  <span class="item-label">S1 Pavagada (150 MW) | S2 Tumakuru (120 MW)</span>
+                  <span class="item-desc">High-irradiance southern Karnataka parks; PR: 0.80, Temp Coeff: -0.4%/°C.</span>
+                </div>
+                <div class="item-block">
+                  <span class="item-label">S3 Koppal (100 MW) | S4 Raichur (80 MW) | S5 Kalaburagi (50 MW)</span>
+                  <span class="item-desc">Geographically distributed solar assets across northern Karnataka corridors.</span>
+                </div>
+              </div>
+            </div>
+            <div class="card emerald-border" style="flex: 1;">
+              <div class="card-title text-emerald">💨 3 Wind Farms (240 MW)</div>
+              <div class="card-body">
+                <div class="item-block">
+                  <span class="item-label">W1 Chitradurga (100 MW) | W2 Gadag (80 MW) | W3 Harapanahalli (60 MW)</span>
+                  <span class="item-desc">IEC cubic power conversion curves (Cut-in: 3 m/s, Rated: 12 m/s, Cut-out: 25 m/s).</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
+            <div class="card amber-border" style="flex: 1;">
+              <div class="card-title text-amber">🔋 2 Battery Systems: 100 MW / 400 MWh</div>
+              <div class="card-body">
+                <div class="item-block">
+                  <span class="item-label">B1 (60 MW / 240 MWh) & B2 (40 MW / 160 MWh)</span>
+                  <span class="item-desc">4-hour duration, 90.25% round-trip efficiency, operating SoC: 10%–95%.</span>
+                </div>
+                <div class="item-block">
+                  <span class="item-label">Degradation Cost Model: ₹500 / MWh</span>
+                  <span class="item-desc">Explicitly penalizes unnecessary cycling to preserve multimillion-dollar BESS assets.</span>
+                </div>
+              </div>
+            </div>
+            <div class="card indigo-border" style="flex: 1;">
+              <div class="card-title text-indigo">🏭 4 Industrial Customers (300 MW Base)</div>
+              <div class="card-body">
+                <div class="item-block">
+                  <span class="item-label">Bellary Steel (120 MW, 60% floor) | Bangalore Data Centre (60 MW, 90% floor)</span>
+                  <span class="item-desc">Strict non-sheddable baselines. Demand Response incentives: ₹3,000–₹6,000/MWh.</span>
+                </div>
+                <div class="item-block">
+                  <span class="item-label">Davanagere Textile (50 MW, 40% floor) | Bagalkot Cement (70 MW, 50% floor)</span>
+                  <span class="item-desc">Shortfall Penalty: ₹15,000/MWh | VOLL Penalty: ₹100,000/MWh.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <div class="slide-footer-left">Grid Limits: 150 MW Import / 200 MW Export | CEA Carbon Factor: 0.71 tCO₂/MWh | Config-driven YAML</div>
+          <div class="slide-number">Slide 5 of 16</div>
+        </div>
+      </div>
+
+      <!-- ================= SLIDE 6: DETAILED ARCHITECTURE ================= -->
+      <div class="slide-page" data-slide="6">
+        <div class="slide-header">
+          <div class="slide-tag">Detailed Structural Architecture</div>
+          <div class="slide-title">The 4-Stage Closed Control Loop Pipeline</div>
+          <div class="slide-subtitle">End-to-end execution flow executed autonomously every 15 minutes with human oversight</div>
+        </div>
+        <div class="slide-body">
+          <div class="card cyan-border">
+            <div class="card-title text-cyan">1. Sensing & Telemetry</div>
+            <div class="card-body">
+              <div class="item-block">
+                <span class="item-label">Telemetry Ingestion</span>
+                <span class="item-desc">Polls 10 generation assets, 2 BESS SoCs, customer meters, and line loadings.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Weather Physics Engine</span>
+                <span class="item-desc">Translates Open-Meteo GHI, DNI, and wind speeds via physical conversion models.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Forecaster Cones</span>
+                <span class="item-desc">Generates rolling 32-interval P10, P50, and P90 forecast cones for next 8 hours.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Market Tariffs</span>
+                <span class="item-desc">Ingests IEX Day-Ahead & Real-Time market pricing feeds.</span>
+              </div>
+            </div>
+          </div>
+          <div class="card indigo-border">
+            <div class="card-title text-indigo">2. Agentic Reasoning Layer</div>
+            <div class="card-body">
+              <div class="item-block">
+                <span class="item-label">Monitor Agent</span>
+                <span class="item-desc">Detects telemetry deltas; summarizes anomalies when severity &ge; medium.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Strategy Agent</span>
+                <span class="item-desc">Selects operational mode (green, economic, storm, etc.) and tunes weights.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Tool-Calling Loop</span>
+                <span class="item-desc">Executes bounded calls: run_milp(), evaluate_risk(), compare_plans().</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Deterministic MILP</span>
+                <span class="item-desc">PuLP/CBC solver computes exact setpoints across 32 intervals in &lt;40 ms.</span>
+              </div>
+            </div>
+          </div>
+          <div class="card rose-border">
+            <div class="card-title text-rose">3. Safety & Governance Gate</div>
+            <div class="card-body">
+              <div class="item-block">
+                <span class="item-label">Hard Guardrails</span>
+                <span class="item-desc">Validates 7 physical safety interlocks before execution.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Self-Healing Loop</span>
+                <span class="item-desc">On rejection, feeds error context back to Strategist to re-solve (up to 2 retries).</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Safe-Mode Fallback</span>
+                <span class="item-desc">If retries fail, executes deterministic Safe-Mode holding 40% BESS reserve.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Operator Approval Gate</span>
+                <span class="item-desc">High-impact actions prompt for operator sign-off in UI.</span>
+              </div>
+            </div>
+          </div>
+          <div class="card emerald-border">
+            <div class="card-title text-emerald">4. Actuation & Audit</div>
+            <div class="card-body">
+              <div class="item-block">
+                <span class="item-label">Dispatch Executor</span>
+                <span class="item-desc">Applies interval t=0 commands to physical assets via MPC logic.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">JSONL Decision Logger</span>
+                <span class="item-desc">Appends immutable audit record with inputs, signals, weights, and results.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Explainer Agent</span>
+                <span class="item-desc">Generates plain-language shift briefing (&le;15 word headline + trade-offs).</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Streamlit Dashboard</span>
+                <span class="item-desc">Updates live dispatch stack, gauges, and audit timeline.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <div class="slide-footer-left">GridMind | Deccan Renewables Pvt. Ltd. | Claim: D2 / F3</div>
+          <div class="slide-number">Slide 6 of 16</div>
+        </div>
+      </div>
+
+      <!-- ================= SLIDE 7: AGENTIC TRIAD ================= -->
+      <div class="slide-page" data-slide="7">
+        <div class="slide-header">
+          <div class="slide-tag">Autonomous Multi-Agent System</div>
+          <div class="slide-title">The Multi-Agent Triad: Monitor, Strategist & Explainer</div>
+          <div class="slide-subtitle">How agents reason, use bounded tools, resolve trade-offs, and maintain strict schema validation</div>
+        </div>
+        <div class="slide-body">
+          <div class="card cyan-border">
+            <div class="card-title text-cyan">🔍 Monitor Agent</div>
+            <div class="card-body">
+              <div class="item-block">
+                <span class="item-label">Delta Tracking</span>
+                <span class="item-desc">Calculates divergence between actual telemetry and forecast cones across all 10 assets.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Severity Scoring</span>
+                <span class="item-desc">Classifies anomaly severity (Low, Medium, High, Critical) based on config thresholds.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Selective LLM Invocation</span>
+                <span class="item-desc">Only calls Gemini when severity &ge; Medium, saving API tokens during quiescent intervals.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Output Schema</span>
+                <span class="item-desc">Strict MonitorReport Pydantic schema passed directly to Strategy Agent.</span>
+              </div>
+            </div>
+          </div>
+          <div class="card indigo-border">
+            <div class="card-title text-indigo">♟️ Strategy Agent</div>
+            <div class="card-body">
+              <div class="item-block">
+                <span class="item-label">Dynamic Mode Selection</span>
+                <span class="item-desc">Shifts operational mode (e.g. green, economic, storm_preparation, outage_recovery).</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Objective Weight Tuning</span>
+                <span class="item-desc">Adjusts multi-objective weight vector w &in; [0, 5] across cost, carbon, degradation, and reliability.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Bounded Tool Exploration</span>
+                <span class="item-desc">Interactively calls run_milp(), evaluate_risk(), and compare_plans() (max 6 calls).</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Trade-Off Justification</span>
+                <span class="item-desc">Generates structured rationale explaining why the winning plan was chosen over alternatives.</span>
+              </div>
+            </div>
+          </div>
+          <div class="card emerald-border">
+            <div class="card-title text-emerald">📢 Explainer Agent</div>
+            <div class="card-body">
+              <div class="item-block">
+                <span class="item-label">Executive Shift Briefing</span>
+                <span class="item-desc">Synthesizes a punchy headline (&le;15 words) for control room shift managers.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Underlying Motives</span>
+                <span class="item-desc">Explains WHY specific actions occurred (e.g., pre-charging BESS ahead of expected evening tariff spike).</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Accepted Trade-Offs</span>
+                <span class="item-desc">Explicitly states what costs were accepted (e.g., accepted ₹25k degradation to prevent ₹300k shortfall).</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Pivot Triggers</span>
+                <span class="item-desc">Defines exact physical thresholds that will cause the plan to be abandoned.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <div class="slide-footer-left">GridMind | Powered by Google Gemini / Deterministic Fallback | 100% Pydantic v2 Validated</div>
+          <div class="slide-number">Slide 7 of 16</div>
+        </div>
+      </div>
+
+      <!-- ================= SLIDE 8: DYNAMIC MULTI-OBJECTIVE ================= -->
+      <div class="slide-page" data-slide="8">
+        <div class="slide-header">
+          <div class="slide-tag">Mathematical Formulation & Trade-Offs</div>
+          <div class="slide-title">Dynamic Multi-Objective Optimization & Conflict Resolution</div>
+          <div class="slide-subtitle">Formal MILP objective formulation and explicit penalty hierarchy for competing operational goals</div>
+        </div>
+        <div class="slide-body" style="flex-direction: column;">
+          <div style="display: flex; gap: 20px;">
+            <div class="card indigo-border" style="flex: 1.3;">
+              <div class="card-title text-indigo">📐 Formal Rolling MILP Formulation</div>
+              <div class="card-body">
+                <div style="font-family: monospace; background: #0A0F1D; padding: 10px; border-radius: 6px; font-size: 11px; color: var(--cyan);">
+                  MIN: w_cost * Cost + w_carbon * Carbon + w_curt * Curtailment + w_degr * Degradation + w_reliab * Shortfall + VOLL * Unserved_Critical
+                </div>
+                <div style="font-size: 11.5px; color: var(--text-slate);">
+                  <strong>Hard Physical Constraints:</strong> Kirchhoff power conservation balance; BESS dynamic SoC continuity; Mutual exclusivity of charge/discharge and import/export; Line thermal limits; 100% Critical Load floor.
+                </div>
+              </div>
+            </div>
+            <div class="card rose-border" style="flex: 1;">
+              <div class="card-title text-rose">⚖️ Conflict Resolution Penalty Hierarchy</div>
+              <div class="card-body">
+                <div class="item-block">
+                  <span class="item-label">VOLL (₹100,000/MWh) strictly dominates</span>
+                  <span class="item-desc">Never shed critical hospital or datacenter load under any circumstance.</span>
+                </div>
+                <div class="item-block">
+                  <span class="item-label">Defensive Reserve (₹25,000/MWh) > Shortfall (₹15,000/MWh)</span>
+                  <span class="item-desc">Accepts minor industrial shortfall to protect BESS emergency buffer during storms.</span>
+                </div>
+                <div class="item-block">
+                  <span class="item-label">Degradation (₹500/MWh) filters low-margin cycles</span>
+                  <span class="item-desc">Only cycles BESS when price spread exceeds round-trip efficiency losses (>₹600/MWh).</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-container" style="margin-top: 10px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Operational Mode</th>
+                  <th>Operational Context / Trigger</th>
+                  <th>Cost (w1)</th>
+                  <th>Carbon (w2)</th>
+                  <th>Curtail (w3)</th>
+                  <th>Degrad (w4)</th>
+                  <th>Reliab (w5)</th>
+                  <th>Reserve Floor</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="td-highlight">green</td>
+                  <td>High midday solar/wind; low market prices</td>
+                  <td>1.0</td>
+                  <td>2.5</td>
+                  <td>3.0</td>
+                  <td>0.8</td>
+                  <td>3.0</td>
+                  <td>15%</td>
+                </tr>
+                <tr>
+                  <td class="td-highlight">economic</td>
+                  <td>Wide price spread (>₹6/kWh); normal grid conditions</td>
+                  <td>3.5</td>
+                  <td>0.8</td>
+                  <td>1.0</td>
+                  <td>1.2</td>
+                  <td>2.5</td>
+                  <td>10%</td>
+                </tr>
+                <tr>
+                  <td class="td-highlight">reliability_first</td>
+                  <td>Forecast deficit; unhedged industrial demand</td>
+                  <td>1.0</td>
+                  <td>0.5</td>
+                  <td>0.5</td>
+                  <td>0.5</td>
+                  <td>5.0</td>
+                  <td>35%</td>
+                </tr>
+                <tr>
+                  <td class="td-highlight">storm_preparation</td>
+                  <td>Severe weather advisory or cyclone warning</td>
+                  <td>0.5</td>
+                  <td>0.5</td>
+                  <td>0.5</td>
+                  <td>0.5</td>
+                  <td>5.0</td>
+                  <td>60%</td>
+                </tr>
+                <tr>
+                  <td class="td-highlight">outage_recovery</td>
+                  <td>Tripped generator or derated transmission line</td>
+                  <td>1.2</td>
+                  <td>1.0</td>
+                  <td>1.0</td>
+                  <td>0.5</td>
+                  <td>4.5</td>
+                  <td>35%</td>
+                </tr>
+                <tr>
+                  <td class="td-highlight">congestion_mgmt</td>
+                  <td>Substation thermal evacuation limit reached</td>
+                  <td>2.0</td>
+                  <td>1.0</td>
+                  <td>3.0</td>
+                  <td>0.8</td>
+                  <td>3.5</td>
+                  <td>20%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <div class="slide-footer-left">GridMind | PuLP Mixed-Integer Linear Programming | Bundled Coin-OR CBC Solver</div>
+          <div class="slide-number">Slide 8 of 16</div>
+        </div>
+      </div>
+
+      <!-- ================= SLIDE 9: UNCERTAINTY HANDLING ================= -->
+      <div class="slide-page" data-slide="9">
+        <div class="slide-header">
+          <div class="slide-tag">Uncertainty & Rolling Optimization</div>
+          <div class="slide-title">3-Tier Uncertainty Handling & Model Predictive Control</div>
+          <div class="slide-subtitle">How GridMind eliminates forecast drift and evaluates tail risk across dynamic weather regimes</div>
+        </div>
+        <div class="slide-body">
+          <div class="card cyan-border">
+            <div class="card-title text-cyan">🔮 Tier 1: Multi-Quantile Forecast Cones</div>
+            <div class="card-body">
+              <div class="item-block">
+                <span class="item-label">P10 Pessimistic Trajectory</span>
+                <span class="item-desc">Models dense cloud banks or sudden lulls. Dictates defensive reserve floors.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">P50 Expected Baseline</span>
+                <span class="item-desc">Central expected trajectory driving primary rolling MILP horizon.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">P90 Optimistic Trajectory</span>
+                <span class="item-desc">Surplus generation trajectory used to schedule pre-charging and export bids.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Rolling 32-Interval Update</span>
+                <span class="item-desc">Regenerated every 15 minutes across all 10 generation and load nodes.</span>
+              </div>
+            </div>
+          </div>
+          <div class="card indigo-border">
+            <div class="card-title text-indigo">🎲 Tier 2: Monte Carlo Risk Evaluation</div>
+            <div class="card-body">
+              <div class="item-block">
+                <span class="item-label">Tool: evaluate_risk(plan_id)</span>
+                <span class="item-desc">Strategist evaluates candidate plans across 20 randomized weather and tariff perturbations.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">P90 Tail Risk Metrics</span>
+                <span class="item-desc">Quantifies worst-case cost, shortfall probability (P_shortfall), and BESS floor breach risk.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Comparative Pruning</span>
+                <span class="item-desc">Rejects plans that look cheap under P50 but carry catastrophic downside risk under tail events.</span>
+              </div>
+            </div>
+          </div>
+          <div class="card emerald-border">
+            <div class="card-title text-emerald">🔄 Tier 3: Receding Horizon MPC</div>
+            <div class="card-body">
+              <div class="item-block">
+                <span class="item-label">32-Interval Forward Window</span>
+                <span class="item-desc">Solves physical optimal dispatch over a full 8-hour forward horizon.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Commit Strictly Interval t=0</span>
+                <span class="item-desc">Crucial: Only the immediate 15-minute setpoint is dispatched to physical assets.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Continuous Closed-Loop Feedback</span>
+                <span class="item-desc">At t=1, new telemetry updates actual SoCs and outputs, re-solving the problem and eliminating forecast drift.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <div class="slide-footer-left">GridMind | Deccan Renewables Pvt. Ltd. | Claim: D2 / F3</div>
+          <div class="slide-number">Slide 9 of 16</div>
+        </div>
+      </div>
+
+      <!-- ================= SLIDE 10: SAFETY & RESILIENCE ================= -->
+      <div class="slide-page" data-slide="10">
+        <div class="slide-header">
+          <div class="slide-tag">Safety Engineering & Reliability</div>
+          <div class="slide-title">Deterministic Guardrails, Self-Healing & 100% Offline Mode</div>
+          <div class="slide-subtitle">Multi-layer defense ensuring zero physical damage and seamless operation without internet connectivity</div>
+        </div>
+        <div class="slide-body">
+          <div class="card rose-border">
+            <div class="card-title text-rose">🛡️ 7 Hard Safety Guardrails</div>
+            <div class="card-body">
+              <div class="item-block">
+                <span class="item-label">1 & 2. BESS & Grid Mutex</span>
+                <span class="item-desc">Charge & Discharge binary exclusivity; Import & Export binary exclusivity.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">3. Physical SoC Operating Band</span>
+                <span class="item-desc">Strictly enforces 10% &le; SoC &le; 95% to prevent thermal runaway or under-voltage.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">4. Inverter C-Rate Limits</span>
+                <span class="item-desc">Discharge rate bounded by 60 MW (B1) and 40 MW (B2).</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">5. Evacuation Line Limits</span>
+                <span class="item-desc">Total grid transfer &le; 150 MW Import / 200 MW Export.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">6 & 7. 100% Critical Load & Gen Caps</span>
+                <span class="item-desc">Zero unserved critical customer load; Generation dispatch capped by physical capacity.</span>
+              </div>
+            </div>
+          </div>
+          <div class="card amber-border">
+            <div class="card-title text-amber">🔄 Self-Healing Recovery Loop</div>
+            <div class="card-body">
+              <div class="item-block">
+                <span class="item-label">Pre-Execution Interception</span>
+                <span class="item-desc">Any plan violating physical constraints is immediately intercepted before execution.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Strategist Re-solve Retries</span>
+                <span class="item-desc">Structured violation feedback is fed back to Strategy Agent to re-solve (up to 2 retries).</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Safe-Mode Dispatch Fallback</span>
+                <span class="item-desc">If retries fail, executes deterministic Safe-Mode: holding 40% BESS reserve, zero exports, and priority customer delivery.</span>
+              </div>
+            </div>
+          </div>
+          <div class="card emerald-border">
+            <div class="card-title text-emerald">🔌 100% Offline Resilience</div>
+            <div class="card-body">
+              <div class="item-block">
+                <span class="item-label">MOCK_LLM=true Mode</span>
+                <span class="item-desc">Full suite functions offline without internet using deterministic mock logic producing identical JSON shapes.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Automatic Error Failover</span>
+                <span class="item-desc">Any Gemini API timeout, rate limit, or network outage triggers instant fallback to mock logic.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Control Room Guarantee</span>
+                <span class="item-desc">The orchestrator NEVER crashes or freezes on the control room desk.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <div class="slide-footer-left">GridMind | Deccan Renewables Pvt. Ltd. | Claim: D2 / F3</div>
+          <div class="slide-number">Slide 10 of 16</div>
+        </div>
+      </div>
+
+      <!-- ================= SLIDE 11: RESPONSIBLE AI ================= -->
+      <div class="slide-page" data-slide="11">
+        <div class="slide-header">
+          <div class="slide-tag">Responsible AI & Governance</div>
+          <div class="slide-title">Human-in-the-Loop Oversight & Decision Auditability</div>
+          <div class="slide-subtitle">Balancing agentic autonomy with operator authority, transparency, and complete compliance tracing</div>
+        </div>
+        <div class="slide-body">
+          <div class="card cyan-border">
+            <div class="card-title text-cyan">👤 Human Approval Gates</div>
+            <div class="card-body">
+              <div class="item-block">
+                <span class="item-label">Dual Governance Modes</span>
+                <span class="item-desc">Operators can toggle between Full Autonomous mode and Manual Approval mode directly in UI.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">High-Impact Interception</span>
+                <span class="item-desc">Voluntary industrial Demand Response curtailment or emergency reserve releases require operator sign-off.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Decision Review Card</span>
+                <span class="item-desc">Displays plain-English motive, financial impact, and trade-off summary before commitment.</span>
+              </div>
+            </div>
+          </div>
+          <div class="card amber-border">
+            <div class="card-title text-amber">🕹️ Real-Time Operator Overrides</div>
+            <div class="card-body">
+              <div class="item-block">
+                <span class="item-label">Full Operator Sovereignty</span>
+                <span class="item-desc">Shift Dispatch Managers can pause, step, or manually override any asset setpoint at any interval.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Safety Cross-Validation</span>
+                <span class="item-desc">Human overrides are still validated through the deterministic guardrails to prevent accidental equipment damage.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Mandatory Rationale Log</span>
+                <span class="item-desc">Captures operator reasoning for compliance audits.</span>
+              </div>
+            </div>
+          </div>
+          <div class="card emerald-border">
+            <div class="card-title text-emerald">📜 Immutable Decision Audit Trail</div>
+            <div class="card-body">
+              <div class="item-block">
+                <span class="item-label">Structured JSONL Logging</span>
+                <span class="item-desc">Every 15-minute interval logs inputs, signals, weights, tool calls, guardrail checks, and executed setpoints.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Forensic Replay & Compliance</span>
+                <span class="item-desc">Enables complete post-incident forensic replay for CERC/KERC regulatory audits.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Zero PII Risk</span>
+                <span class="item-desc">Strictly handles physical engineering and market parameters (MW, MWh, ₹, °C). Zero personal data processed.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <div class="slide-footer-left">GridMind | Deccan Renewables Pvt. Ltd. | Claim: D2 / F3</div>
+          <div class="slide-number">Slide 11 of 16</div>
+        </div>
+      </div>
+
+      <!-- ================= SLIDE 12: BENCHMARK RESULTS ================= -->
+      <div class="slide-page" data-slide="12">
+        <div class="slide-header">
+          <div class="slide-tag">Empirical Benchmark & Business Proof</div>
+          <div class="slide-title">24-Hour Comparative Head-to-Head Performance</div>
+          <div class="slide-subtitle">Evaluating GridMind Agent vs Fixed MILP vs Traditional Rule-Based Baseline under identical Summer conditions</div>
+        </div>
+        <div class="slide-body" style="flex-direction: column;">
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 12px;">
+            <div class="stat-box" style="border-color: var(--emerald);">
+              <div class="stat-val text-emerald">-44.5%</div>
+              <div class="stat-label">Net Operating Cost</div>
+              <div class="stat-sub">₹18.2M daily savings vs Rule Baseline</div>
+            </div>
+            <div class="stat-box" style="border-color: var(--cyan);">
+              <div class="stat-val text-cyan">-88.7%</div>
+              <div class="stat-label">Contract Shortfall</div>
+              <div class="stat-sub">From 1,312.4 MWh down to 148.4 MWh</div>
+            </div>
+            <div class="stat-box" style="border-color: var(--amber);">
+              <div class="stat-val text-amber">100%</div>
+              <div class="stat-label">Critical Load Protected</div>
+              <div class="stat-sub">0.000 MWh shed (vs 43.2 MWh in baseline)</div>
+            </div>
+            <div class="stat-box" style="border-color: var(--indigo);">
+              <div class="stat-val text-indigo">0</div>
+              <div class="stat-label">Safety Violations</div>
+              <div class="stat-sub">Zero hard constraint violations verified</div>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Operational Performance Metric</th>
+                  <th>1. Rule Baseline</th>
+                  <th>2. Fixed MILP</th>
+                  <th>3. GridMind Agent</th>
+                  <th>Agent vs Baseline Impact</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight: 700; color: var(--text-white);">Total Net Operating Cost (₹)</td>
+                  <td class="td-warn">₹40,900,584</td>
+                  <td>₹22,770,752</td>
+                  <td class="td-highlight">₹22,686,441</td>
+                  <td class="td-highlight">-44.5% (-₹18,214,143/day)</td>
+                </tr>
+                <tr>
+                  <td>Grid Import Energy Cost (₹)</td>
+                  <td>₹13,908,012</td>
+                  <td>₹13,343,759</td>
+                  <td class="td-highlight">₹13,190,232</td>
+                  <td>-5.2% Import Cost Cut</td>
+                </tr>
+                <tr>
+                  <td>Export Market Revenue (₹)</td>
+                  <td>₹0</td>
+                  <td>₹370,138</td>
+                  <td class="td-highlight">₹188,489</td>
+                  <td>+₹188,489 Arbitrage Profit</td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 700; color: var(--text-white);">Contract Delivery Shortfall (MWh)</td>
+                  <td class="td-warn">1,312.40 MWh</td>
+                  <td>154.21 MWh</td>
+                  <td class="td-highlight">148.36 MWh</td>
+                  <td class="td-highlight">-88.7% Reduction</td>
+                </tr>
+                <tr>
+                  <td>Shortfall Penalties Incurred (₹)</td>
+                  <td class="td-warn">₹19,686,008</td>
+                  <td>₹2,313,176</td>
+                  <td class="td-highlight">₹2,225,422</td>
+                  <td class="td-highlight">-88.7% (-₹17.4M Penalty Saved)</td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 700; color: var(--text-white);">Unserved Critical Customer Load</td>
+                  <td class="td-warn">43.247 MWh (Brownout)</td>
+                  <td>0.000 MWh</td>
+                  <td class="td-highlight">0.000 MWh</td>
+                  <td class="td-highlight">100% Protected (0 VOLL)</td>
+                </tr>
+                <tr>
+                  <td>Carbon Emissions (tCO₂)</td>
+                  <td>1,874.5 tCO₂</td>
+                  <td>1,803.2 tCO₂</td>
+                  <td class="td-highlight">1,769.0 tCO₂</td>
+                  <td>-5.6% (-105.5 tCO₂ Avoided)</td>
+                </tr>
+                <tr>
+                  <td>Renewable Energy Utilization</td>
+                  <td>100.0%</td>
+                  <td>100.0%</td>
+                  <td class="td-highlight">100.0%</td>
+                  <td>0.0% Clean Curtailment</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <div class="slide-footer-left">GridMind | Deccan Renewables Pvt. Ltd. | Claim: D2 / F3</div>
+          <div class="slide-number">Slide 12 of 16</div>
+        </div>
+      </div>
+
+      <!-- ================= SLIDE 13: 30-DAY RELIABILITY ================= -->
+      <div class="slide-page" data-slide="13">
+        <div class="slide-header">
+          <div class="slide-tag">Rigorous Stress-Testing & Audit</div>
+          <div class="slide-title">Multi-Day Reliability Stress-Test: D2 Verifiable Proof</div>
+          <div class="slide-subtitle">Continuous 30-day simulation suite across 2,880 consecutive intervals with 21 injected severe disturbances</div>
+        </div>
+        <div class="slide-body">
+          <div class="card emerald-border" style="flex: 0.9;">
+            <div class="card-title text-emerald">🛡️ Verified Audit Metrics</div>
+            <div class="card-body">
+              <div class="item-block">
+                <span class="item-label">Total Simulated Intervals</span>
+                <span class="item-desc">2,880 intervals (30 days across Summer & Monsoon regimes).</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Stochastic Disturbances Injected</span>
+                <span class="item-desc">21 severe events (clouds, price spikes, line deratings, inverter trips).</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Hard Safety Violations</span>
+                <span class="item-desc" style="color: var(--emerald); font-weight: 800; font-size: 14px;">0 (Target: 0) — 100% Verified Compliance</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Unserved Critical Load</span>
+                <span class="item-desc" style="color: var(--emerald); font-weight: 800; font-size: 14px;">0.000000 MWh (Target: 0) — Zero Brownouts</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Safe-Mode Invocations</span>
+                <span class="item-desc">0 intervals required emergency safe-mode fallback.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Mean Daily Net Operating Cost</span>
+                <span class="item-desc">₹14,447,206.53 (P90 Tail Cost: ₹22,040,643.76).</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Mean Renewable Utilization</span>
+                <span class="item-desc">100.0% (Zero clean generation wasted).</span>
+              </div>
+            </div>
+          </div>
+          <div style="flex: 1.1; display: flex; flex-direction: column; gap: 16px;">
+            <div class="card cyan-border" style="flex: 1;">
+              <div class="card-title text-cyan">⚡ Disturbance Resilience Showcase (21 Injected Events)</div>
+              <div class="card-body">
+                <div class="item-block">
+                  <span class="item-label">Cloud Shock (Pavagada Solar)</span>
+                  <span class="item-desc">Solar output drops 70% in 15 min &rarr; Strategist ramps B1 BESS discharge and engages industrial Demand Response, absorbing shock with zero shortfall.</span>
+                </div>
+                <div class="item-block">
+                  <span class="item-label">IEX Evening Tariff Spike (₹9,800/MWh)</span>
+                  <span class="item-desc">Peak spot tariff &rarr; Agent cuts grid imports to zero, discharges stored solar from BESS, and exports surplus power to capture high revenue.</span>
+                </div>
+                <div class="item-block">
+                  <span class="item-label">Transmission Line Derating (150 MW &rarr; 60 MW)</span>
+                  <span class="item-desc">Evacuation limit choked &rarr; Autonomous Congestion Management mode rebalances local generation without thermal trip.</span>
+                </div>
+              </div>
+            </div>
+            <div class="card amber-border" style="flex: 1;">
+              <div class="card-title text-amber">🔬 Audit Artifact & Reproducibility</div>
+              <div class="card-body">
+                <div class="item-block">
+                  <span class="item-label">Saved JSON Audit Artifact</span>
+                  <span class="item-desc">Complete audit persisted in <code>data/processed/reliability_summary.json</code> for regulatory verification.</span>
+                </div>
+                <div class="item-block">
+                  <span class="item-label">One-Command Reproduction</span>
+                  <span class="item-desc">Run locally in 5 minutes via: <code>python scripts/run_reliability.py</code> (elapsed: 356.4s).</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <div class="slide-footer-left">GridMind | Deccan Renewables Pvt. Ltd. | Claim: D2 / F3</div>
+          <div class="slide-number">Slide 13 of 16</div>
+        </div>
+      </div>
+
+      <!-- ================= SLIDE 14: WORKING PROTOTYPE ================= -->
+      <div class="slide-page" data-slide="14">
+        <div class="slide-header">
+          <div class="slide-tag">Working Prototype Demonstration</div>
+          <div class="slide-title">The Control Room Dashboard Walkthrough</div>
+          <div class="slide-subtitle">An 8-page interactive operational application built for Shift Dispatch Managers and Operations Executives</div>
+        </div>
+        <div class="slide-body" style="flex-direction: column;">
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; flex: 1;">
+            <div class="card cyan-border">
+              <div class="card-title text-cyan">1. 🎮 Control Room</div>
+              <div class="card-body">
+                <div class="item-block">
+                  <span class="item-label">Live Dispatch Stack</span>
+                  <span class="item-desc">Stacked area chart (Solar, Wind, BESS, Grid) with committed demand line.</span>
+                </div>
+                <div class="item-block">
+                  <span class="item-label">BESS SoC Gauges</span>
+                  <span class="item-desc">Visual percentage gauges for B1 (240 MWh) and B2 (160 MWh).</span>
+                </div>
+                <div class="item-block">
+                  <span class="item-label">Interval Stepper</span>
+                  <span class="item-desc">Step, Auto-run (1s/interval), or Reset simulation.</span>
+                </div>
+              </div>
+            </div>
+            <div class="card amber-border">
+              <div class="card-title text-amber">2. ⚡ Event Injector</div>
+              <div class="card-body">
+                <div class="item-block">
+                  <span class="item-label">Interactive Disturbances</span>
+                  <span class="item-desc">Inject clouds, price spikes, line deratings, or storm alerts on demand.</span>
+                </div>
+                <div class="item-block">
+                  <span class="item-label">Preset Scenarios</span>
+                  <span class="item-desc">One-click scripts for severe summer & monsoon operational shocks.</span>
+                </div>
+              </div>
+            </div>
+            <div class="card indigo-border">
+              <div class="card-title text-indigo">3. 🧠 Agent Reasoning</div>
+              <div class="card-body">
+                <div class="item-block">
+                  <span class="item-label">Tool-Calling Trace</span>
+                  <span class="item-desc">Inspects exact parameters for run_milp(), evaluate_risk(), compare_plans().</span>
+                </div>
+                <div class="item-block">
+                  <span class="item-label">Shift Briefing Card</span>
+                  <span class="item-desc">Executive headline, underlying motives, and accepted trade-offs.</span>
+                </div>
+              </div>
+            </div>
+            <div class="card emerald-border">
+              <div class="card-title text-emerald">4. 📜 Decision Log</div>
+              <div class="card-body">
+                <div class="item-block">
+                  <span class="item-label">Filterable Timeline</span>
+                  <span class="item-desc">Searchable interval history with severity filters.</span>
+                </div>
+                <div class="item-block">
+                  <span class="item-label">Raw JSON Inspector</span>
+                  <span class="item-desc">Inspect exact inputs, candidate plans, and validation results.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; flex: 1; margin-top: 14px;">
+            <div class="card cyan-border">
+              <div class="card-title text-cyan">5. 📊 Scenario Compare</div>
+              <div class="card-body">
+                <div class="item-block">
+                  <span class="item-label">3-Way Strategy Benchmark</span>
+                  <span class="item-desc">Rule Baseline vs Fixed MILP vs GridMind Agent.</span>
+                </div>
+                <div class="item-block">
+                  <span class="item-label">Cumulative Savings</span>
+                  <span class="item-desc">Financial and emissions curves showing ₹18.2M daily delta.</span>
+                </div>
+              </div>
+            </div>
+            <div class="card amber-border">
+              <div class="card-title text-amber">6. 🛡️ Reliability Report</div>
+              <div class="card-body">
+                <div class="item-block">
+                  <span class="item-label">30-Day Audit Inspector</span>
+                  <span class="item-desc">Interactive review of the 2,880-interval stress test.</span>
+                </div>
+                <div class="item-block">
+                  <span class="item-label">Cost Distributions</span>
+                  <span class="item-desc">P10/P50/P90 cost histograms across summer and monsoon.</span>
+                </div>
+              </div>
+            </div>
+            <div class="card indigo-border">
+              <div class="card-title text-indigo">7. 🗺️ Data & Map</div>
+              <div class="card-body">
+                <div class="item-block">
+                  <span class="item-label">Karnataka Asset Map</span>
+                  <span class="item-desc">PyDeck GIS visualization of 5 solar, 3 wind, and 2 BESS sites.</span>
+                </div>
+                <div class="item-block">
+                  <span class="item-label">Custom CSV Upload</span>
+                  <span class="item-desc">Upload custom IEX price and customer load series.</span>
+                </div>
+              </div>
+            </div>
+            <div class="card emerald-border">
+              <div class="card-title text-emerald">8. 🏗️ Architecture</div>
+              <div class="card-body">
+                <div class="item-block">
+                  <span class="item-label">Interactive Blueprint</span>
+                  <span class="item-desc">System component roles, flowcharts, and equations.</span>
+                </div>
+                <div class="item-block">
+                  <span class="item-label">Prompt Library</span>
+                  <span class="item-desc">View exact system prompts for Monitor, Strategist, Explainer.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <div class="slide-footer-left">One-Command Local Launch: <code>./scripts/run_demo.sh</code> | Streamlit on localhost:8501</div>
+          <div class="slide-number">Slide 14 of 16</div>
+        </div>
+      </div>
+
+      <!-- ================= SLIDE 15: SCALABILITY & ROADMAP ================= -->
+      <div class="slide-page" data-slide="15">
+        <div class="slide-header">
+          <div class="slide-tag">Engineering Quality & Roadmap</div>
+          <div class="slide-title">Scalability, System Integration & Production Roadmap</div>
+          <div class="slide-subtitle">Linear computational complexity, industrial SCADA connectivity, and commercial solver portability</div>
+        </div>
+        <div class="slide-body">
+          <div class="card cyan-border">
+            <div class="card-title text-cyan">⚡ 1. Computational Scalability</div>
+            <div class="card-body">
+              <div class="item-block">
+                <span class="item-label">Linear Problem Growth</span>
+                <span class="item-desc">Variables grow strictly linearly O(T &times; (N_farms + N_bess + N_consumers)).</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Sub-Second Solve Times</span>
+                <span class="item-desc">Current 10-asset portfolio solves in ~40 ms using bundled CBC. Scaling to 50 farms and 20 BESS takes &lt;250 ms.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Pluggable Solvers</span>
+                <span class="item-desc">PuLP abstraction layer allows drop-in commercial solvers (Gurobi, HiGHS, COPT) with one configuration flag.</span>
+              </div>
+            </div>
+          </div>
+          <div class="card indigo-border">
+            <div class="card-title text-indigo">🔌 2. Industrial Integration</div>
+            <div class="card-body">
+              <div class="item-block">
+                <span class="item-label">SCADA / EMS Protocols</span>
+                <span class="item-desc">Forecaster and Executor abstract telemetry over industrial Modbus TCP, OPC-UA, and MQTT streaming.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Live Market APIs</span>
+                <span class="item-desc">Direct connectors for Indian Energy Exchange (IEX) Day-Ahead Market (DAM) and Real-Time Market (RTM).</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Edge & Cloud Deploy</span>
+                <span class="item-desc">Stateless orchestration runs on local control room IPCs or cloud AWS/Azure clusters.</span>
+              </div>
+            </div>
+          </div>
+          <div class="card emerald-border">
+            <div class="card-title text-emerald">🧪 3. Engineering Rigor</div>
+            <div class="card-body">
+              <div class="item-block">
+                <span class="item-label">57 Passing Unit & Integration Tests</span>
+                <span class="item-desc">Comprehensive test coverage across physics, simulation, MILP solver, agents, and guardrails (<code>pytest tests/ -v</code>).</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Strict Config Separation</span>
+                <span class="item-desc">Zero magic numbers; all asset specs, tariffs, and thresholds reside in <code>config/*.yaml</code> manifests.</span>
+              </div>
+              <div class="item-block">
+                <span class="item-label">Zero Framework Bloat</span>
+                <span class="item-desc">Pure Python, PuLP, Streamlit, and Pydantic. No heavyweight agent framework dependencies.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <div class="slide-footer-left">GridMind | Deccan Renewables Pvt. Ltd. | Claim: D2 / F3</div>
+          <div class="slide-number">Slide 15 of 16</div>
+        </div>
+      </div>
+
+      <!-- ================= SLIDE 16: CONCLUSION & SCORECARD ================= -->
+      <div class="slide-page" data-slide="16">
+        <div class="slide-header">
+          <div class="slide-tag">Submission Summary & Scorecard</div>
+          <div class="slide-title">Hackathon Evaluation Alignment Scorecard</div>
+          <div class="slide-subtitle">Directly mapping GridMind deliverables against all 8 evaluation criteria and submission requirements</div>
+        </div>
+        <div class="slide-body">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 22%;">Evaluation Criterion</th>
+                  <th style="width: 26%;">Hackathon Requirement</th>
+                  <th style="width: 28%;">How GridMind Satisfies It</th>
+                  <th style="width: 24%;">Verifiable Proof</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight: 700; color: var(--text-white);">1. Significance & Relevance</td>
+                  <td>Genuine business need connected to core problem</td>
+                  <td>Solves 15-min dispatch crisis for Deccan Renewables (Karnataka)</td>
+                  <td class="td-highlight">₹18.2M/day operating savings; 88.7% penalty cut</td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 700; color: var(--text-white);">2. Innovation & Originality</td>
+                  <td>Creative approach vs conventional tools</td>
+                  <td>Neuro-symbolic coupling: Gemini reasoning + PuLP MILP optimization</td>
+                  <td class="td-highlight">LLM tunes weights & evaluates risk; solver guarantees physics</td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 700; color: var(--text-white);">3. Effective Use of AI</td>
+                  <td>AI is central, not merely bolted on</td>
+                  <td>Multi-agent triad (Monitor, Strategist, Explainer) drives adaptive strategy</td>
+                  <td class="td-highlight">Dynamic mode shifts & bounded tool-calling loop</td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 700; color: var(--text-white);">4. Technical Complexity</td>
+                  <td>Quality of architecture, algorithms & pipelines</td>
+                  <td>Rolling 32-interval MPC, multi-quantile cones, Monte Carlo tail risk</td>
+                  <td class="td-highlight">57 passing pytest unit/integration tests</td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 700; color: var(--text-white);">5. Agentic Capability</td>
+                  <td>Reasons, plans, uses tools, self-heals, operates autonomously</td>
+                  <td>Strategy Agent calls tools (run_milp, evaluate_risk) & self-corrects</td>
+                  <td class="td-highlight">Guardrail feedback loop with 2 autonomous retries</td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 700; color: var(--text-white);">6. Business Impact</td>
+                  <td>Measurable improvement in cost, risk, sustainability</td>
+                  <td>Dramatic cost reduction, clean energy utilization, contract delivery</td>
+                  <td class="td-highlight">-44.5% net cost, -88.7% shortfalls, 100% critical protection</td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 700; color: var(--text-white);">7. Prototype Usability</td>
+                  <td>Working, intuitive, demonstrable prototype</td>
+                  <td>8-page interactive Streamlit Control Room application</td>
+                  <td class="td-highlight">One-command local launch (./scripts/run_demo.sh)</td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 700; color: var(--text-white);">8. Scalability & Governance</td>
+                  <td>Responsible AI, robustness, human oversight</td>
+                  <td>D2/F3 proven, deterministic guardrails, approval gates, offline mode</td>
+                  <td class="td-highlight">0 violations over 2,880 intervals; 100% offline fallback</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <div class="slide-footer-left">GridMind | Both Submission Mandates Complete: 1. Working Demo  2. Detailed Structural Architecture</div>
+          <div class="slide-number">Slide 16 of 16</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Speaker Notes Drawer -->
+  <div class="notes-drawer" id="notesDrawer">
+    <div class="notes-header">🎙️ Presenter Speaker Notes & Talking Points</div>
+    <div id="notesContent">Loading notes...</div>
+  </div>
+
+  <script>
+    const totalSlides = 16;
+    let currentSlide = 1;
+
+    const speakerNotes = {
+      1: "Good morning judges. We are thrilled to present GridMind, our autonomous renewable energy orchestrator developed for the ET AI Hackathon: Agentic Edition. We are addressing Problem Statement 4: Utilities. Our target client is Deccan Renewables Pvt. Ltd. in Karnataka, managing 740 MW of renewable generation, 400 MWh of battery storage, and 300 MW of industrial customers. Our claimed position on the 9-blocker grid is strictly D2 / F3: high demonstrable reliability through deterministic safety gates, combined with rolling uncertainty simulation. Let's dive into why this problem is mission-critical.",
+      2: "Every 15 minutes, renewable dispatchers face an impossible mental juggling act. In Karnataka, Deccan Renewables operates 5 solar parks and 3 wind farms. If clouds blanket Pavagada Solar Park or wind drops in Chitradurga, generation plummets. Meanwhile, they are contractually bound to deliver continuous Round-The-Clock power to Bellary Steel and a Bangalore Data Centre. A single shortfall interval costs ₹15,000 per MWh in penalties. But buying blindly from the IEX spot market when prices spike to ₹10/kWh destroys profits. And cycling batteries blindly degrades multi-crore BESS assets. Human dispatchers simply cannot solve this multi-variable dynamic optimization every 15 minutes.",
+      3: "The hackathon guidelines explicitly state: declare your self-estimated position on the 9-blocker grid and justify it. Overestimating or underestimating incurs penalties. We claim D2 / F3. Why D2? Our inputs are structured telemetry, weather forecasts, and market prices. But we demonstrate HIGH reliability: zero hard safety violations over 30 days of simulation and zero unserved critical load. We do NOT claim D3 because we do not process satellite imagery or raw computer vision. Claiming D3 would be an ungrounded overclaim. Why F3? We satisfy all F1, F2, and F3 features: optimal cluster of actions, dynamic optimality determination under uncertainty, and rolling multi-day simulation with stochastic perturbations.",
+      4: "Here is our central architectural breakthrough. Rule #1 of GridMind is: The LLM never computes dispatch numbers. If you ask an LLM to decide how many megawatts each battery should discharge, it will hallucinate. In power systems, hallucinating 15 megawatts blows a substation transformer. On the other hand, traditional MILP solvers are mathematically sound but contextually blind. They cannot adapt when a cyclone warning is declared or trade off battery degradation against market spikes. GridMind solves this with a Neuro-Symbolic architecture: Gemini provides contextual reasoning, operational mode selection, and risk comparison, while PuLP MILP computes exact physical dispatch in 40 milliseconds, validated by hard code guardrails.",
+      5: "To make our prototype realistic, we modeled an actual utility footprint in Karnataka. Our generation portfolio includes 500 MW across 5 solar parks, including Pavagada, one of the world's largest solar parks, and 240 MW across 3 wind parks in Chitradurga and Gadag. We have 400 MWh of lithium-ion battery storage with real 90.25% round-trip efficiency and ₹500/MWh degradation penalties. We serve four real-world industrial offtakers totaling 300 MW, each with distinct critical load baselines. The Bangalore Data Centre has a 90% non-sheddable floor, while Bellary Steel has 60%. All asset specs live in config YAML files with zero hardcoded numbers.",
+      6: "Here is the complete structural architecture required by the hackathon submission. Every 15 minutes, the system executes this four-stage loop: Stage 1 Sensing: We ingest physical telemetry from our Karnataka assets, compute physical solar and wind conversion, and forecast P10/P50/P90 trajectories 8 hours ahead. Stage 2 Reasoning: The Monitor Agent flags anomalies. The Strategist Agent enters a bounded tool-calling loop, testing candidate weight profiles in the PuLP MILP solver and evaluating tail risk across Monte Carlo scenarios. Stage 3 Safety: Before any setpoint touches hardware, our deterministic Python guardrails verify 7 physical constraints. If anything violates safety, it triggers a recovery loop or fails safe to a 40% battery hold. Stage 4 Actuation: We execute interval t=0, log an immutable audit record, and provide a plain-language briefing to the shift operator.",
+      7: "Let's look at the three agents inside GridMind. The Monitor Agent watches asset telemetry. If generation diverges from forecast, it classifies the event and triggers replanning. To conserve tokens, it only invokes the LLM when anomalies are meaningful. The Strategy Agent is our core reasoner. It selects the operating mode and tunes the multi-objective weights. It has access to three deterministic tools: run_milp, evaluate_risk, and compare_plans. It calls these in a bounded loop to test candidate strategies. The Explainer Agent serves the human operator. It creates concise shift briefings explaining exactly why decisions were made, what trade-offs were accepted, and what conditions would trigger a pivot.",
+      8: "Problem 4 in the hackathon brief explicitly demands that the solution make its optimality criteria clear and demonstrate how actions are chosen when objectives conflict. Here is our mathematical formulation. We balance six competing terms: electricity cost, carbon emissions, renewable curtailment, battery degradation, contract shortfall, and unserved load. Look at our conflict hierarchy: VOLL is ₹100,000/MWh. It strictly dominates everything else, guaranteeing critical loads are never shed. When a cyclone is incoming, storm preparation shifts the reserve floor to 60%, paying shortfall penalties if necessary to maintain defensive energy. During price arbitrage, battery degradation at ₹500/MWh ensures we only cycle batteries when price spreads exceed round-trip efficiency losses.",
+      9: "How do we handle renewable intermittency and input uncertainty? Through a 3-tier uncertainty architecture. First, our Forecaster generates multi-quantile cones: P10 pessimistic, P50 expected, and P90 optimistic for all 10 assets over 32 intervals. Second, before executing a plan, the Strategy Agent calls evaluate_risk(), which runs a Monte Carlo simulation across 20 randomized weather and tariff perturbations. It computes expected cost and P90 tail risk. Third, we use Receding Horizon Model Predictive Control. While we optimize 8 hours ahead, we only execute the first 15-minute interval. At t=1, fresh telemetry arrives and we re-solve. This completely eliminates cumulative forecast drift.",
+      10: "Safety and fault tolerance are non-negotiable for electric grids. Before any setpoint is sent to actuators, our deterministic Python guardrail layer checks 7 hard physical interlocks: no simultaneous charge and discharge, no simultaneous import and export, strict battery SoC limits between 10% and 95%, and 100% critical load protection. If a plan violates a guardrail, the system triggers an autonomous self-healing loop: the Strategist receives the exact violation feedback and re-solves. If two retries fail, it falls back to a deterministic Safe-Mode holding a 40% battery reserve. Furthermore, GridMind has 100% offline resilience: if the internet drops or Gemini times out, deterministic mock logic engages instantly with zero latency penalty.",
+      11: "Responsible AI is a primary evaluation parameter in this hackathon. We designed GridMind with deep human-in-the-loop governance. In the dashboard, operators can engage Manual Approval mode. High-impact decisions, such as shedding industrial customer loads or releasing emergency reserves, require operator sign-off. Shift Dispatch Managers have complete override authority: they can pause the agent, step interval by interval, or override setpoints directly. Finally, every single action is logged into an immutable JSONL audit file: every telemetry point, LLM reasoning trace, tool call, and solver result can be replayed for CERC or KERC regulatory audits. And because we handle pure electrical parameters, there is zero private data risk.",
+      12: "Here is our headline business impact. We ran a head-to-head 24-hour comparative benchmark under identical summer weather conditions and injected disturbances: Strategy 1 is traditional rule-based utility operation. Strategy 2 is fixed-weight MILP optimization. Strategy 3 is GridMind Autonomous Agent. The results speak for themselves: Total net operating cost drops by 44.5% — saving Deccan Renewables ₹18.2 Million per day. Contract delivery shortfalls plummet by 88.7%, from 1,312 MWh to just 148 MWh, saving ₹17.4 Million in penalties alone. Most critically, look at unserved critical customer load: the traditional baseline shed 43.2 MWh of critical load, causing brownouts at the hospital and steel plant. GridMind delivered zero shed load — 100% protection.",
+      13: "To back up our D2 claim with bulletproof evidence, we ran a continuous 30-day reliability stress test: 2,880 consecutive 15-minute intervals spanning both summer and monsoon seasons. During this test, we injected 21 severe disturbances: sudden cloud cover over Pavagada, extreme IEX price spikes up to ₹10/kWh, transmission corridor deratings, and inverter trips. The verified audit outcome: Zero hard-constraint violations. Zero MWh of unserved critical load. 100% clean energy utilization. The entire 30-day suite runs in under 6 minutes on a standard laptop via python scripts/run_reliability.py, and the complete audit artifact is stored in reliability_summary.json.",
+      14: "The hackathon explicitly requires a working demo. Our prototype is not a mock UI or static Figma prototype. It is a fully operational, 8-page Streamlit application that launches locally with a single command: ./scripts/run_demo.sh. Page 1 is the Control Room, showing live generation stacks, battery gauges, and step-by-step dispatch. Page 2 is the Event Injector, allowing judges to inject cloud shocks, price spikes, or line trips and watch the agent react in real time. Page 3 inspects Agent Reasoning, displaying tool calls and natural-language shift briefings. Pages 4 through 8 provide complete audit logging, benchmark comparisons, 30-day reliability reports, interactive GIS asset maps of Karnataka, and system architecture blueprints.",
+      15: "Looking toward real-world industrial deployment: GridMind is built with enterprise engineering discipline. First, computational scalability: our MILP formulation scales linearly. Our 10-asset system solves in 40 milliseconds using the free open-source CBC solver. Even a 50-farm portfolio solves in 250 milliseconds, well within 15-minute dispatch cycles. Second, industrial connectivity: the sensing layer is designed to plug directly into SCADA and EMS systems via Modbus TCP and OPC-UA, and pulls live market prices from IEX. Third, code quality: we have 57 passing unit and integration tests across 5 phases, with zero framework bloat: no LangChain, no CrewAI, no Docker required.",
+      16: "In conclusion, GridMind provides an end-to-end, fully verified answer to Problem Statement 4. We satisfy every single one of the eight hackathon evaluation parameters: Significance: Solving the ₹18M/day dispatch dilemma for Deccan Renewables. Innovation: A neuro-symbolic agent architecture where AI reasons and math optimizes. Agentic capability: Tool-calling Strategy Agent with autonomous self-healing. Business impact: 44.5% cost reduction and 88.7% contract shortfall cut. Demonstrable prototype: An 8-page interactive control room running locally. And rigorous governance: Claiming D2/F3 with verified zero safety violations over 30 simulated days. Thank you, and we welcome your questions!"
+    };
+
+    function updateSlide() {
+      document.querySelectorAll('.slide-page').forEach(page => {
+        page.classList.remove('active');
+        if (parseInt(page.dataset.slide) === currentSlide) {
+          page.classList.add('active');
+        }
+      });
+      document.getElementById('counter').innerText = `${currentSlide} / ${totalSlides}`;
+      document.getElementById('prevBtn').disabled = (currentSlide === 1);
+      document.getElementById('nextBtn').disabled = (currentSlide === totalSlides);
+      
+      const note = speakerNotes[currentSlide] || "No speaker notes for this slide.";
+      document.getElementById('notesContent').innerText = note;
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        currentSlide++;
+        updateSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        currentSlide--;
+        updateSlide();
+      }
+    }
+
+    function toggleNotes() {
+      const drawer = document.getElementById('notesDrawer');
+      const btn = document.getElementById('notesToggle');
+      drawer.classList.toggle('open');
+      btn.classList.toggle('active');
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key === 's' || e.key === 'S') {
+        toggleNotes();
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFullscreen();
+      } else if (e.key === 'Home') {
+        currentSlide = 1;
+        updateSlide();
+      } else if (e.key === 'End') {
+        currentSlide = totalSlides;
+        updateSlide();
+      }
+    });
+
+    // Initialize
+    updateSlide();
+  </script>
+</body>
+</html>
